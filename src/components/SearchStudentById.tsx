@@ -6,30 +6,35 @@ export default function SearchStudentById({ setFilteredStudents, setIsSearching 
   const [error, setError] = useState("");
 
   const handleSearch = async () => {
-    setError("");
+  setError("");
 
-    if (!id) {
-      setError("Please enter a student ID");
-      return;
-    }
+  if (!id) {
+    setError("Please enter a student ID");
+    setIsSearching(false);
+    return;
+  }
 
-    try {
-      const res = await getStudentById(Number(id));
+  try {
+    const student = await getStudentById(Number(id));
 
-      setFilteredStudents([res.data]);
-      setIsSearching(true); // ✅ important
+    //SUCCESS: student was found
+    setFilteredStudents([student]);
+    setError(null); // Clear any old errors
+    setIsSearching(true);
 
-    } catch (err) {
-      if (err.response?.status === 404) {
-        setError(`Student not found with ID: ${id}`);
-      } else {
-        setError("Something went wrong");
-      }
+  } catch (err: any) {
+    //ERROR: student not found or server error
+    console.error("Catch block caught:", err.message);
 
-      setFilteredStudents([]);
-      setIsSearching(true); // ✅ still searching but empty
-    }
-  };
+    setFilteredStudents([]); // Clear table
+
+    // Since your service throws 'new Error(data.message)',
+    // err.message will be: "Student not found with id: 100"
+    setError(err.message); 
+
+    setIsSearching(true);
+  }
+};
 
   const handleClear = () => {
     setFilteredStudents([]);
