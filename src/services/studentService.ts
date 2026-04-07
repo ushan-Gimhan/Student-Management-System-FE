@@ -8,7 +8,7 @@ export interface Student {
   profileImageUrl?: string;
 }
 
-const API_URL = "http://localhost:8080/api/students";
+const API_URL = import.meta.env.VITE_API_URL;
 
 export const getAllStudents = () => axios.get<Student[]>(API_URL);
 export const addStudent = (student: Omit<Student, "id">) => axios.post(API_URL, student);
