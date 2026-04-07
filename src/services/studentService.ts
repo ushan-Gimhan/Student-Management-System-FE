@@ -21,4 +21,17 @@ export const uploadProfileImage = (id: number, file: File) => {
 };
 
 export const deleteProfileImage = (id: number) => axios.delete(`${API_URL}/${id}/profile-image`);
-export const getStudentById = (id: number) => axios.get<Student>(`${API_URL}/${id}`);
+export const getStudentById = async (id: number) => {
+  const res = await fetch(`${API_URL}/${id}`);
+  
+  // Parse the JSON (works for both 200 OK and 404 Not Found)
+  const data = await res.json(); 
+
+  if (!res.ok) {
+    // data is { "message": "Student not found with id: 100" }
+    // We throw the specific message from the backend
+    throw new Error(data.message || "An error occurred"); 
+  }
+
+  return data; // This is the student object
+};
