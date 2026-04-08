@@ -51,17 +51,16 @@ const [isSearching, setIsSearching] = useState(false);
     profileImage?: File
   ) => {
     try {
-      const res = await addStudent(student);
-      if (profileImage && res.data?.id) {
-        await uploadProfileImage(res.data.id, profileImage);
-      }
+      await addStudent(student, profileImage); //single API call
       await loadStudents();
       showSuccess("Student added successfully!");
     } catch (err) {
       console.error("Failed to add student", err);
       showError("Failed to add student. Please try again.");
     }
-  };
+};
+
+
 
   const handleUpdate = async (
     id: number,
