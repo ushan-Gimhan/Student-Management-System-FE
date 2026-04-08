@@ -11,7 +11,25 @@ export interface Student {
 const API_URL = import.meta.env.VITE_API_URL;
 
 export const getAllStudents = () => axios.get<Student[]>(API_URL);
-export const addStudent = (student: Omit<Student, "id">) => axios.post(API_URL, student);
+export const addStudent = (student: Omit<Student, "id">, file?: File) => {
+  const formData = new FormData();
+
+  //Convert the student object to a JSON string 
+  //(matches @RequestPart("student") String studentJson in your controller)
+  formData.append("student", JSON.stringify(student));
+
+  // Append the file if it exists 
+  // (matches @RequestPart("file") in your controller)
+  if (file) {
+    formData.append("file", file);
+  }
+
+  return axios.post(API_URL, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+};
 export const updateStudent = (id: number, student: Omit<Student, "id">) => axios.put(`${API_URL}/${id}`, student);
 export const deleteStudent = (id: number) => axios.delete(`${API_URL}/${id}`);
 export const uploadProfileImage = (id: number, file: File) => {
