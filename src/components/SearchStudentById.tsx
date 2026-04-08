@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { getStudentById } from "../services/studentService";
+import axios from 'axios';
+import type { Student } from "../services/studentService";
 
-export default function SearchStudentById({ setFilteredStudents, setIsSearching }) {
+export default function SearchStudentById({ setFilteredStudents, setIsSearching }: { setFilteredStudents: React.Dispatch<React.SetStateAction<Student[]>>; setIsSearching: React.Dispatch<React.SetStateAction<boolean>> }) {
   const [id, setId] = useState("");
-  const [error, setError] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
   const handleSearch = async () => {
   setError("");
@@ -22,23 +24,20 @@ export default function SearchStudentById({ setFilteredStudents, setIsSearching 
     setError(null); // Clear any old errors
     setIsSearching(true);
 
-  } catch (err: any) {
-    //ERROR: student not found or server error
-    console.error("Catch block caught:", err.message);
-
-    setFilteredStudents([]); // Clear table
-
-    // Since your service throws 'new Error(data.message)',
-    // err.message will be: "Student not found with id: 100"
-    setError(err.message); 
-
-    setIsSearching(true);
+  } catch (err: unknown) {
+    if (axios.isAxiosError(err)) {
+      // I know exactly what this is now!
+      setError(err.response?.data?.message || "Server error");
+    } else {
+      // This is a normal JS error
+      setError(err instanceof Error ? err.message : "Unknown error");
+    }
   }
 };
 
   const handleClear = () => {
     setFilteredStudents([]);
-    setIsSearching(false); // ✅ go back to full list
+    setIsSearching(false); //go back to full list
     setId("");
     setError("");
   };
